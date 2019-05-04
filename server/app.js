@@ -84,19 +84,17 @@ app.post('/login', (req, res) => {
   var username = req.body.username;
   var password = req.body.password;
 
-  return models.Users.get({ username: username })
-    .then(results => {
-      if (results.password === password) {
-        res.status(200);
-        res.end();
+  models.Users.get({ username: username })
+    .then((result) => {
+      if (models.Users.compare(password, result.password, result.salt)) {
+        res.redirect('/');
       } else {
-        res.status(400);
-        res.end();
+        res.redirect('/login');
       }
-    }).catch(err => {
-      res.status(400);
-      res.end();
+    }).catch(() => {
+      res.redirect('/login');
     });
+
 });
 
 app.post('/signup', (req, res) => {
